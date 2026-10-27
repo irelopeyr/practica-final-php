@@ -1,0 +1,33 @@
+services:
+  web:
+    image: php:8.3-apache
+    command: bash -c "docker-php-ext-install pdo pdo_mysql && apache2-foreground"
+
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tienda
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
+
+  phpmyadmin:
+    image: phpmyadmin
+    environment:
+      PMA_HOST: db
+    ports:
+      - "8082:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
